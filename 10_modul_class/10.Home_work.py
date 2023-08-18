@@ -1,12 +1,13 @@
 from collections import UserDict
 from functools import partial
 
+
+# Класс Field, который родительский для всех полей. По умолчанию передает параметр, что поле необязательное.
 class Field:
-    def __init__(self, value, is_required=False, is_multiple=False):
+    def __init__(self, value, is_required=False):
         if is_required and not value:
             raise ValueError("Это поле является обязательным")
         self.value = value
-        self.is_multiple = is_multiple
 
 class Name(Field):
     def __init__(self, value):
@@ -16,27 +17,27 @@ class Phone(Field):
     def __init__(self, value):
         if not value.isdigit():
             raise ValueError("Телефон должен содержать только цифры")
-        super().__init__(value, is_multiple=True)
+        super().__init__(value)
 
 class Record:
-    def __init__(self, name, phones=None):
+    def __init__(self, name, phone=None):
         self.name = Name(name)
-        self.phones = phones if phones else []
+        self.phone = Phone(phone) if phone else None
 
     def add_phone(self, phone_number):
         phone = Phone(phone_number)
-        self.phones.append(phone)   
+        self.phone.append(phone)   
 
     def edit_phone(self,index, phone_number):
-        if index < 0 or index >= len(self.phones):
+        if index < 0 or index >= len(self.phone):
             raise IndexError("Некорректный индекс")
-        self.phones[index].value = phone_number  
+        self.phone[index].value = phone_number  
 
     def remove_phone(self, phone_number):
-        phone = Phone(phone_number)
-        for index, phone in enumerate(self.phones):
-            if phone.value == phone_number:
-                self.phones.pop(index)
+        target_phone = Phone(phone_number)
+        for index, existing_phone in enumerate(self.phone):
+            if existing_phone.value == target_phone.value:
+                self.phone.pop(index)
                 break    
 
 class AddressBook(UserDict):
@@ -48,7 +49,9 @@ def input_error(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except(KeyError, ValueError, IndexError, TypeError):
+        except ValueError as error:
+            return str(error)  # Возврат текста ошибки ValueError
+        except (KeyError, IndexError, TypeError):
             return "An error occurred. Please check your input."
 
     return wrapper
@@ -58,24 +61,24 @@ def input_error(func):
 
 @input_error
 def add_contact(contact_book, name, phone):
-    record = Record(name, [Phone(phone)])
+    record = Record(name, phone)
     contact_book.add_record(name, record)
     return f'телефонный номер {name} {phone} добавлен'
 
 @input_error
 def change_contact(contact_book, name, phone):
     record = contact_book.data[name]
-    record.phones[0].value = phone
+    record.phone.value = phone
     return f'у контакта {name} изменен номер телефона'
 
 @input_error
 def phone(contact_book, name):
-    return contact_book[name].phones[0].value
+    return contact_book[name].phone.value
 
 @input_error
 def show(contact_book, arg):
     if arg == 'all':
-        return '\n'.join([f'{rec.name.valuea}: {rec.phones[0].value}' for rec in contact_book.values()])
+        return '\n'.join([f'{rec.name.value}: {rec.phone.value}' for rec in contact_book.values() if rec.phone])
     else:
         return 'Unknown argument. Please try again.'
 
