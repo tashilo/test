@@ -17,12 +17,14 @@ class Phone(Field):
     def __init__(self, value):
         if not value.isdigit():
             raise ValueError("Телефон должен содержать только цифры")
-        super().__init__(value)
+        super().__init__(value, is_required=True)
 
 class Record:
     def __init__(self, name, phone=None):
         self.name = Name(name)
-        self.phone = Phone(phone) if phone else None
+        self.phone = []
+        if phone:
+            self.add_phone(phone)
 
     def add_phone(self, phone_number):
         phone = Phone(phone_number)
