@@ -1,0 +1,16 @@
+{
+    "contacts": [
+        {
+            "name": "Allen Raymond",
+            "email": "nulla.ante@vestibul.co.uk",
+            "phone": "(992) 914-3792",
+            "favorite": false
+        },
+        {
+            "name": "Tanya",
+            "email": "tanya@example.com",
+            "phone": "+380631234567",
+            "favorite": true
+        }
+    ]
+}
