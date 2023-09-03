@@ -28,13 +28,13 @@ class Phone(Field):
     @value.setter
     def value(self, new_value):
         if not self.validate_phone(new_value):
-            raise ValueError("Некоректний номер телефону")
+            raise ValueError(
+                "Некоректний номер телефоную. Код должен состоять из 13-ти знаков и начинаться с кода страны. Например: +381234567890"
+            )
         self._value = new_value
 
     def validate_phone(self, value):
-        if not value.startswith("+380") or len(value) != 13 or not value[1:].isdigit():
-            return False
-        return True
+        return value.startswith("+380") and len(value) == 13 and value[1:].isdigit()
 
 
 # Клас для дня народження
